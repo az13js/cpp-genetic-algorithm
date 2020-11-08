@@ -1,0 +1,2 @@
+#define GeneticAlgorithm_VERSION_MAJOR @GeneticAlgorithm_VERSION_MAJOR@
+#define GeneticAlgorithm_VERSION_MINOR @GeneticAlgorithm_VERSION_MINOR@
