@@ -69,6 +69,7 @@ namespace GeneticAlgorithm {
         }
         long double maxFitness = std::numeric_limits<long double>::min();
         unsigned long offset = 0;
+        this->maxFitnessChromosomeCache = this->chromosomeArray[offset];
         for (unsigned long i = 0; i < this->numberOfChromosome; i++) {
             if (this->chromosomeArray[i]->getFitness() > maxFitness) {
                 offset = i;
