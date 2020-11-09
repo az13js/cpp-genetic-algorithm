@@ -30,6 +30,10 @@ namespace GeneticAlgorithm {
 
         // 设置debug模式，为true的时候打印调试信息
         void setDebug(bool enableDebug);
+        // 获取迭代次数。如果在一开始初始化的那代种群就达到停止的条件，那么返回0
+        unsigned long getLoopNumber();
+        // 获取最大的适应度
+        long double getMaxFitness();
 
     private:
         // 染色体or个体的数量

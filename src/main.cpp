@@ -9,6 +9,7 @@
 #include "GeneticAlgorithm/MainProcess.h"
 
 using namespace GeneticAlgorithm;
+using namespace std;
 
 int main()
 {

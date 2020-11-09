@@ -60,6 +60,14 @@ namespace GeneticAlgorithm {
         this->debug = enableDebug;
     }
 
+    unsigned long MainProcess::getLoopNumber() {
+        return this->loopNow;
+    }
+
+    long double MainProcess::getMaxFitness() {
+        return this->maxFitness;
+    }
+
     void MainProcess::init() {
         this->population = PopulationFactory().buildRandomPopulation(this->numberOfChromosome, this->lengthOfChromosome);
         this->loopNow = 0;
