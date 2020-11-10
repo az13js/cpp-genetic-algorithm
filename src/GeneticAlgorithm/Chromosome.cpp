@@ -17,7 +17,10 @@ namespace GeneticAlgorithm {
         if (offset > this->lengthOfData - 1) {
             return false;
         }
-        this->dataArray[offset] = value;
+        if (this->dataArray[offset] != value) {
+            this->dataArray[offset] = value;
+            this->isFitnessCached = false;
+        }
         return true;
     }
 
