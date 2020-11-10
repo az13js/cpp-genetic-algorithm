@@ -7,6 +7,7 @@ namespace GeneticAlgorithm {
     Population::Population(unsigned long numberOfChromosome) {
         this->chromosomeArray = new Chromosome*[numberOfChromosome];
         this->numberOfChromosome = numberOfChromosome;
+        // 新建立的数组，任意的 this->chromosomeArray[i] 都是 0x00
     }
 
     Population::~Population() {
@@ -19,19 +20,47 @@ namespace GeneticAlgorithm {
     }
 
     bool Population::setChromosome(unsigned long offset, Chromosome *chromosome) {
-        if (offset < this->numberOfChromosome) {
-            this->chromosomeArray[offset] = chromosome;
-            this->isMaxFitnessChromosomeCache = false;
+        if (offset < this->numberOfChromosome && !this->chromosomeArray[offset]) {
+            if (this->isMaxFitnessChromosomeCache) {
+                if (this->maxFitnessChromosomeCache->getFitness() > chromosome->getFitness()) {
+                    if (this->maxFitnessChromosomeOffset != offset) {
+                        this->chromosomeArray[offset] = chromosome;
+                    } else {
+                        this->isMaxFitnessChromosomeCache = false;
+                        this->chromosomeArray[offset] = chromosome;
+                    }
+                } else {
+                    this->maxFitnessChromosomeCache = chromosome;
+                    this->maxFitnessChromosomeOffset = offset;
+                    this->chromosomeArray[offset] = chromosome;
+                }
+            } else {
+                this->chromosomeArray[offset] = chromosome;
+            }
             return true;
         }
         return false;
     }
 
     bool Population::replaceChromosome(unsigned long offset, Chromosome *chromosome) {
-        if (offset < this->numberOfChromosome) {
+        if (offset < this->numberOfChromosome && this->chromosomeArray[offset]) {
             delete this->chromosomeArray[offset];
-            this->chromosomeArray[offset] = chromosome;
-            this->isMaxFitnessChromosomeCache = false;
+            if (this->isMaxFitnessChromosomeCache) { // 这段逻辑与setChromosome里面的相同
+                if (this->maxFitnessChromosomeCache->getFitness() > chromosome->getFitness()) {
+                    if (this->maxFitnessChromosomeOffset != offset) {
+                        this->chromosomeArray[offset] = chromosome;
+                    } else {
+                        this->isMaxFitnessChromosomeCache = false;
+                        this->chromosomeArray[offset] = chromosome;
+                    }
+                } else {
+                    this->maxFitnessChromosomeCache = chromosome;
+                    this->maxFitnessChromosomeOffset = offset;
+                    this->chromosomeArray[offset] = chromosome;
+                }
+            } else {
+                this->chromosomeArray[offset] = chromosome;
+            }
             return true;
         }
         return false;
@@ -61,6 +90,7 @@ namespace GeneticAlgorithm {
         );
         this->isMaxFitnessChromosomeCache = true;
         this->maxFitnessChromosomeCache = this->chromosomeArray[0];
+        this->maxFitnessChromosomeOffset = 0;
     }
 
     Chromosome* Population::getMaxFitnessChromosome() {
@@ -78,6 +108,7 @@ namespace GeneticAlgorithm {
         }
         this->isMaxFitnessChromosomeCache = true;
         this->maxFitnessChromosomeCache = this->chromosomeArray[offset];
+        this->maxFitnessChromosomeOffset = offset;
         return this->chromosomeArray[offset];
     }
 

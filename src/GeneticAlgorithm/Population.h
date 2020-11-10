@@ -36,6 +36,8 @@ namespace GeneticAlgorithm {
         bool isMaxFitnessChromosomeCache = false;
         // 缓存的当前种群最大适应度个体的适应度
         Chromosome* maxFitnessChromosomeCache;
+        // 最大适应度个体的偏移位置
+        unsigned long maxFitnessChromosomeOffset;
 
     };
 

@@ -77,7 +77,9 @@ namespace GeneticAlgorithm {
     }
 
     void MainProcess::sort() {
-        this->population->sort();
+        if (1 != this->keep) { // 为了优化流程，只保留一个的时候不必排序
+            this->population->sort();
+        }
     }
 
     // 锦标赛选择算法，执行速度比轮盘赌的快
@@ -123,8 +125,24 @@ namespace GeneticAlgorithm {
     }
 
     void MainProcess::generated() {
-        for (unsigned long i = this->keep; i < this->numberOfChromosome; i++) {
-            this->population->replaceChromosome(i, this->newChromosome[i - this->keep]);
+        if (1 != this->keep) {
+            for (unsigned long i = this->keep; i < this->numberOfChromosome; i++) {
+                this->population->replaceChromosome(i, this->newChromosome[i - this->keep]);
+            }
+        } else {
+            unsigned long replaceOffset = 0, newChromosomePoolOffset = 0;
+            bool isSeeMaxFitnessChromosome = false;
+            long double maxFitness = this->population->getMaxFitnessChromosome()->getFitness();
+            for (unsigned long i = 0; i < this->numberOfChromosome; i++) {
+                if (this->population->getChromosome(replaceOffset)->getFitness() < maxFitness || isSeeMaxFitnessChromosome) {
+                    this->population->replaceChromosome(replaceOffset, this->newChromosome[newChromosomePoolOffset]);
+                    newChromosomePoolOffset++;
+                    replaceOffset++;
+                } else {
+                    isSeeMaxFitnessChromosome = true;
+                    replaceOffset++;
+                }
+            }
         }
     }
 
