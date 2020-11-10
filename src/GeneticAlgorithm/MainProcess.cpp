@@ -1,7 +1,7 @@
-#include "MainProcess.h"
-#include <iostream>
-#include "PopulationFactory.h"
 #include <random>
+#include <iostream>
+#include "MainProcess.h"
+#include "PopulationFactory.h"
 #include "Utils/GlobalCppRandomEngine.h"
 #include "Chromosome.h"
 
@@ -112,15 +112,8 @@ namespace GeneticAlgorithm {
         if (0 >= this->r) {
             return;
         }
-        using std::uniform_real_distribution;
-        using namespace GeneticAlgorithm::Utils;
-        uniform_real_distribution<long double> range(0.0, 1.0);
         for (unsigned long i = 0; i < this->kill; i++) {
-            for (unsigned long j = 0; j < this->lengthOfChromosome; j++) {
-                if (range(GlobalCppRandomEngine::engine) <= this->r) {
-                    this->newChromosome[i]->setGene(j, 1 - this->newChromosome[i]->getGene(j));
-                }
-            }
+            this->newChromosome[i]->mutation(this->r);
         }
     }
 

@@ -1,6 +1,7 @@
-#include "Chromosome.h"
 #include <iostream>
+#include "Chromosome.h"
 #include "ChromosomeFactory.h"
+#include "Utils/GlobalCppRandomEngine.h"
 
 namespace GeneticAlgorithm {
 
@@ -43,17 +44,37 @@ namespace GeneticAlgorithm {
         if (another->getLength() != this->lengthOfData) {
             throw "Length not equals!";
         }
-        int *newData = new int[this->lengthOfData];
+        using std::uniform_int_distribution;
+        using GeneticAlgorithm::Utils::GlobalCppRandomEngine;
+        uniform_int_distribution<int> range(0, 1);
+
+        int* newData = new int[this->lengthOfData];
         for (unsigned long i = 0; i < this->lengthOfData; i++) {
-            if (i % 2 == 0) {
+            if (range(GlobalCppRandomEngine::engine) == 0) {
                 newData[i] = this->dataArray[i];
             } else {
                 newData[i] = another->getGene(i);
             }
         }
+
         Chromosome* newChromosome = ChromosomeFactory().buildFromArray(newData, this->lengthOfData);
         delete[] newData;
         return newChromosome;
+    }
+
+    void Chromosome::mutation(long double r) {
+        if (r <= 0.0) {
+            return;
+        }
+        using std::uniform_real_distribution;
+        using GeneticAlgorithm::Utils::GlobalCppRandomEngine;
+        uniform_real_distribution<long double> range(0.0, 1.0);
+        for (unsigned long i = 0; i < this->lengthOfData; i++) {
+            if (range(GlobalCppRandomEngine::engine) <= r) {
+                this->dataArray[i] = 1 - this->dataArray[i];
+                this->isFitnessCached = false;
+            }
+        }
     }
 
     long double Chromosome::getFitness() {

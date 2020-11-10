@@ -26,6 +26,8 @@ namespace GeneticAlgorithm {
         long double getFitness();
         // 与另一个染色体交叉，返回新的染色体
         Chromosome* crossover(Chromosome* another);
+        // 以一定的概率r变异
+        void mutation(long double r);
 
     private:
         // 保存了此染色体的长度
