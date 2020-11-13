@@ -124,17 +124,13 @@ namespace GeneticAlgorithm {
             }
         } else {
             unsigned long replaceOffset = 0, newChromosomePoolOffset = 0;
-            bool isSeeMaxFitnessChromosome = false;
-            long double maxFitness = this->population->getMaxFitnessChromosome()->getFitness();
+            Chromosome* maxFitnessChromosome = this->population->getMaxFitnessChromosome();
             for (unsigned long i = 0; i < this->numberOfChromosome; i++) {
-                if (this->population->getChromosome(replaceOffset)->getFitness() < maxFitness || isSeeMaxFitnessChromosome) {
+                if ((void*)(this->population->getChromosome(replaceOffset)) != (void*)maxFitnessChromosome) {
                     this->population->replaceChromosome(replaceOffset, this->newChromosome[newChromosomePoolOffset]);
                     newChromosomePoolOffset++;
-                    replaceOffset++;
-                } else {
-                    isSeeMaxFitnessChromosome = true;
-                    replaceOffset++;
                 }
+                replaceOffset++;
             }
         }
     }
