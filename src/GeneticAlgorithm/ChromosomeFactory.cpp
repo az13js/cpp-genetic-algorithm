@@ -5,7 +5,7 @@
 
 namespace GeneticAlgorithm {
 
-    Chromosome* ChromosomeFactory::buildFromArray(int data[], unsigned long lengthOfData) {
+    Chromosome* ChromosomeFactory::buildFromArray(long double data[], unsigned long lengthOfData) {
         Chromosome* buildChromosome = this->buildEmpty(lengthOfData);
         for (unsigned long i = 0; i < lengthOfData; i++) {
             if (!buildChromosome->setGene(i, data[i])) {
@@ -15,16 +15,13 @@ namespace GeneticAlgorithm {
         return buildChromosome;
     }
 
-    Chromosome* ChromosomeFactory::buildRandomBinrary(unsigned long lengthOfData) {
-        using std::uniform_int_distribution;
+    Chromosome* ChromosomeFactory::buildRandomChromosome(unsigned long lengthOfData, long double min, long double max) {
         using namespace GeneticAlgorithm::Utils;
-
-        int *data = new int[lengthOfData];
-        uniform_int_distribution<int> formateRandomNumberRange(0, 1);
+        long double *data = new long double[lengthOfData];
+        std::uniform_real_distribution<long double> formateRandomNumberRange(min, max);
         for (unsigned long i = 0; i < lengthOfData; i++) {
             data[i] = formateRandomNumberRange(GlobalCppRandomEngine::engine);
         }
-
         Chromosome* buildChromosome = this->buildFromArray(data, lengthOfData);
         delete[] data;
         return buildChromosome;
