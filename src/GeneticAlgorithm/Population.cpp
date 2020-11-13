@@ -6,8 +6,10 @@ namespace GeneticAlgorithm {
 
     Population::Population(unsigned long numberOfChromosome) {
         this->chromosomeArray = new Chromosome*[numberOfChromosome];
+        for (unsigned long i = 0; i < numberOfChromosome; i++) { // 新建立的数组，任意的 this->chromosomeArray[i] 未必是 0x00
+            this->chromosomeArray[i] = nullptr;
+        }
         this->numberOfChromosome = numberOfChromosome;
-        // 新建立的数组，任意的 this->chromosomeArray[i] 都是 0x00
     }
 
     Population::~Population() {
