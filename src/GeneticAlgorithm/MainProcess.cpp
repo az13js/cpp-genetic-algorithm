@@ -17,6 +17,8 @@ namespace GeneticAlgorithm {
     void MainProcess::run(
         unsigned long numberOfChromosome,
         unsigned long lengthOfChromosome,
+        long double min,
+        long double max,
         unsigned long maxLoop,
         long double stopFitness,
         unsigned long keep,
@@ -26,6 +28,8 @@ namespace GeneticAlgorithm {
         this->freeMemory(); // 防止重复调用run()没有释放上一次的内存
         this->numberOfChromosome = numberOfChromosome;
         this->lengthOfChromosome = lengthOfChromosome;
+        this->min = min;
+        this->max = max;
         this->keep = keep;
         this->kill = numberOfChromosome - keep;
         this->r = r;
@@ -69,7 +73,7 @@ namespace GeneticAlgorithm {
     }
 
     void MainProcess::init() {
-        this->population = PopulationFactory().buildRandomPopulation(this->numberOfChromosome, this->lengthOfChromosome);
+        this->population = PopulationFactory().buildRandomPopulation(this->numberOfChromosome, this->lengthOfChromosome, this->min, this->max);
         this->loopNow = 0;
         this->maxFitness = 0.0;
         this->selectedChromosome = new Chromosome*[2 * this->kill];

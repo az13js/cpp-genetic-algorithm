@@ -6,7 +6,7 @@
 namespace GeneticAlgorithm {
 
     Chromosome::Chromosome(unsigned long lengthOfChromosome) {
-        this->dataArray = new int[lengthOfChromosome];
+        this->dataArray = new long double[lengthOfChromosome];
         this->lengthOfData = lengthOfChromosome;
     }
 
@@ -14,7 +14,7 @@ namespace GeneticAlgorithm {
         delete[] this->dataArray;
     }
 
-    bool Chromosome::setGene(unsigned long offset, int value) {
+    bool Chromosome::setGene(unsigned long offset, long double value) {
         if (offset > this->lengthOfData - 1) {
             return false;
         }
@@ -25,7 +25,7 @@ namespace GeneticAlgorithm {
         return true;
     }
 
-    int Chromosome::getGene(unsigned long offset) {
+    long double Chromosome::getGene(unsigned long offset) {
         if (offset > this->lengthOfData - 1) {
             throw "Error, out of range.";
         }
@@ -33,30 +33,37 @@ namespace GeneticAlgorithm {
     }
 
     void Chromosome::dump() {
-        std::cout << "Fitness=" << this->getFitness() << ",v1=" << this->v1 << ",v2=" << this->v2 << std::endl;
+        std::cout << "Fitness=" << this->getFitness() << ",v1=" << this->dataArray[0] << ",v2=" << this->dataArray[1] << std::endl;
     }
 
     unsigned long Chromosome::getLength() {
         return this->lengthOfData;
     }
 
+    long double Chromosome::getFitness() {
+        if (this->isFitnessCached) {
+            return this->fitnessCached;
+        }
+        if (this->lengthOfData < 2) {
+            throw "Can not less then 2.";
+        }
+        long double v1, v2, y;
+        v1 = this->dataArray[0];
+        v2 = this->dataArray[1];
+        y = 100.0 * (v1 * v1 - v2) * (v1 * v1 - v2) + (1.0 - v1) * (1.0 - v1);
+        // y 最小等于0，我们求最大适应度需要反过来
+        this->fitnessCached = 1.0 / (y + 0.01);
+        return this->fitnessCached;
+    }
+
     Chromosome* Chromosome::crossover(Chromosome* another) {
         if (another->getLength() != this->lengthOfData) {
             throw "Length not equals!";
         }
-        using std::uniform_int_distribution;
-        using GeneticAlgorithm::Utils::GlobalCppRandomEngine;
-        uniform_int_distribution<int> range(0, 1);
-
-        int* newData = new int[this->lengthOfData];
+        long double* newData = new long double[this->lengthOfData];
         for (unsigned long i = 0; i < this->lengthOfData; i++) {
-            if (range(GlobalCppRandomEngine::engine) == 0) {
-                newData[i] = this->dataArray[i];
-            } else {
-                newData[i] = another->getGene(i);
-            }
+            newData[i] = (this->dataArray[i] + another->getGene(i)) / 2.0;
         }
-
         Chromosome* newChromosome = ChromosomeFactory().buildFromArray(newData, this->lengthOfData);
         delete[] newData;
         return newChromosome;
@@ -66,59 +73,10 @@ namespace GeneticAlgorithm {
         if (r <= 0.0) {
             return;
         }
-        using std::uniform_real_distribution;
         using GeneticAlgorithm::Utils::GlobalCppRandomEngine;
-        uniform_real_distribution<long double> range(0.0, 1.0);
+        std::normal_distribution<long double> distribution(0, r);
         for (unsigned long i = 0; i < this->lengthOfData; i++) {
-            if (range(GlobalCppRandomEngine::engine) <= r) {
-                this->dataArray[i] = 1 - this->dataArray[i];
-                this->isFitnessCached = false;
-            }
+            this->dataArray[i] += distribution(GlobalCppRandomEngine::engine);
         }
-    }
-
-    long double Chromosome::getFitness() {
-        if (this->isFitnessCached) {
-            return this->fitnessCached;
-        }
-        if (this->lengthOfData < 16) {
-            throw "Can not less then 16 bit.";
-        }
-        unsigned int len1 = 64, len2 = 64;
-        if (this->lengthOfData < 128) {
-            len1 = this->lengthOfData / 2;
-            len2 = this->lengthOfData - len1;
-        }
-        int *arr1 = new int[len1];
-        int *arr2 = new int[len2];
-        unsigned long long max1 = 0, max2 = 0;
-        long double v1, v2;
-        for (unsigned int i = 0; i < len1; i++) {
-            arr1[i] = this->dataArray[i];
-            max1 = (max1 << 1) | 0x01;
-        }
-        v1 = (long double)this->getSimpleInteger(arr1, len1) / (long double)max1 * 4.096 - 2.048;
-        for (unsigned int i = 0; i < len2; i++) {
-            arr2[i] = this->dataArray[len1 + i];
-            max2 = (max2 << 1) | 0x01;
-        }
-        v2 = (long double)this->getSimpleInteger(arr2, len2) / (long double)max2 * 4.096 - 2.048;
-        long double y = 100.0 * (v1 * v1 - v2) * (v1 * v1 - v2) + (1.0 - v1) * (1.0 - v1);
-        // y 最小等于0，我们求最大适应度需要反过来
-        this->fitnessCached = 1.0 / (y + 0.01);
-        this->v1 = v1;
-        this->v2 = v2;
-        delete[] arr1;
-        delete[] arr2;
-        return this->fitnessCached;
-    }
-
-    unsigned long long Chromosome::getSimpleInteger(int *intArray, unsigned long lengthOfIntArray) {
-        unsigned long long x = 0;
-        for (unsigned long i = 0; i < lengthOfIntArray; i++) {
-            x <<= 1;
-            x |= (0x01 & intArray[i]);
-        }
-        return x;
     }
 }

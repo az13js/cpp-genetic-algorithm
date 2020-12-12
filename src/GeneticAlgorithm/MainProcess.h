@@ -6,10 +6,9 @@
 
 namespace GeneticAlgorithm {
 
-    // 内存占用估计方法：y=Kx+b
-    // K=0.9504 b=1764
-    // x 是种群中个体的数量
-    // y 是程序占用内存，单位kb
+    /**
+     * 算法主流程
+     */
     class MainProcess {
 
     public:
@@ -22,6 +21,8 @@ namespace GeneticAlgorithm {
         void run(
             unsigned long numberOfChromosome, // 种群中个体数量
             unsigned long lengthOfChromosome, // 每个个体的基因长度
+            long double min, // 一开始初始种群时，随机数范围最小值
+            long double max, // 一开始初始种群时，随机数范围最大值
             unsigned long maxLoop, // 最大迭代次数
             long double stopFitness, // 达到多大的适应度就立刻停止迭代
             unsigned long keep, // 每次迭代保留多少个上一代的个体
@@ -40,6 +41,10 @@ namespace GeneticAlgorithm {
         unsigned long numberOfChromosome;
         // 染色体的长度
         unsigned long lengthOfChromosome;
+        // 随机初始范围
+        long double min;
+        // 随机初始范围
+        long double max;
         // 每次迭代从上一代保留多少个个体
         unsigned long keep;
         // 每次迭代上上一道销毁多少个个体，这个根据numberOfChromosome和lengthOfChromosome算出来的
