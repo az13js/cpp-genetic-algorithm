@@ -31,4 +31,12 @@ namespace GeneticAlgorithm {
         return new Chromosome(lengthOfData);
     }
 
+    Chromosome* ChromosomeFactory::buildFromChromosome(Chromosome* existsChromosome) {
+        Chromosome* result = this->buildEmpty(existsChromosome->getLength());
+        for (unsigned long i = 0; i < result->getLength(); i++) {
+            result->setGene(i, existsChromosome->getGene(i));
+        }
+        return result;
+    }
+
 }
