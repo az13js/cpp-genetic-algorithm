@@ -42,6 +42,14 @@ namespace GeneticAlgorithm {
          */
         Chromosome* buildEmpty(unsigned long lengthOfData);
 
+        /**
+         * 拷贝式创建
+         *
+         * @param Chromosome* existsChromosome
+         * @return Chromosome*
+         */
+        Chromosome* buildFromChromosome(Chromosome* existsChromosome);
+
     };
 
 }

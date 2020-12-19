@@ -60,6 +60,49 @@ namespace GeneticAlgorithm {
         }
     }
 
+    void MainProcess::runContinue(
+        unsigned long maxLoop, // 这一次的最大迭代次数
+        long double stopFitness, // 达到多大的适应度就立刻停止迭代
+        unsigned long keep, // 每次迭代保留多少个上一代的个体
+        long double r // 基因突变的概率
+    ) {
+        using namespace std;
+        if (nullptr == this->population || nullptr == this->selectedChromosome || nullptr == this->newChromosome) {
+            return;
+        }
+        if (1 == this->keep && keep > 1) { // 之前是keep=1的话，会因为优化而不会排序
+            this->keep = keep;
+            this->sort(); // 先排序避免后满淘汰掉较优解
+        } else {
+            this->keep = keep;
+        }
+        this->kill = this->numberOfChromosome - keep;
+        // 尺寸发生变化，删除旧的再申请新空间
+        delete[] this->selectedChromosome;
+        delete[] this->newChromosome;
+        this->selectedChromosome = new Chromosome*[2 * this->kill];
+        this->newChromosome = new Chromosome*[this->kill];
+        this->r = r;
+        unsigned long i = 0;
+        while (i < maxLoop && this->maxFitness < stopFitness) {
+            this->select();
+            this->crossover();
+            this->mutation();
+            this->generated();
+            this->sort();
+            this->maxFitness = this->population->getMaxFitnessChromosome()->getFitness();
+            this->loopNow++;
+            if (this->debug) {
+                cout << "代数=" << this->loopNow << ", 最大适应度=" << this->maxFitness << ", 个体信息=";
+                this->population->getMaxFitnessChromosome()->dump();
+            }
+            i++;
+        }
+        if (this->debug) {
+            cout << "结束。" << endl;
+        }
+    }
+
     void MainProcess::setDebug(bool enableDebug) {
         this->debug = enableDebug;
     }
@@ -70,6 +113,20 @@ namespace GeneticAlgorithm {
 
     long double MainProcess::getMaxFitness() {
         return this->maxFitness;
+    }
+
+    Chromosome* MainProcess::getMaxFitnessChromosome() {
+        return this->population->getMaxFitnessChromosome();
+    }
+
+    void MainProcess::replaceChromosome(Chromosome* chromosome) {
+        Chromosome* max = this->population->getMaxFitnessChromosome();
+        for (unsigned long offset = this->numberOfChromosome - 1; offset + 2 > 1; offset--) {
+            if ((void*)this->population->getChromosome(offset) != (void*)max) {
+                this->population->replaceChromosome(offset, chromosome);
+                return;
+            }
+        }
     }
 
     void MainProcess::init() {
