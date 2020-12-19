@@ -70,20 +70,24 @@ namespace GeneticAlgorithm {
         if (nullptr == this->population || nullptr == this->selectedChromosome || nullptr == this->newChromosome) {
             return;
         }
-        if (1 == this->keep && keep > 1) { // 之前是keep=1的话，会因为优化而不会排序
-            this->keep = keep;
-            this->sort(); // 先排序避免后满淘汰掉较优解
-        } else {
-            this->keep = keep;
+        if (this->keep != keep) { // 之前是keep=1的话，会因为优化而不会排序
+            if (1 == this->keep && keep > 1) { // 之前是keep=1的话，会因为优化而不会排序
+                this->keep = keep;
+                this->kill = this->numberOfChromosome - keep;
+                this->sort(); // 先排序避免后满淘汰掉较优解
+            } else {
+                this->keep = keep;
+                this->kill = this->numberOfChromosome - keep;
+            }
+            // 尺寸发生变化，删除旧的再申请新空间
+            delete[] this->selectedChromosome;
+            delete[] this->newChromosome;
+            this->selectedChromosome = new Chromosome*[2 * this->kill];
+            this->newChromosome = new Chromosome*[this->kill];
         }
-        this->kill = this->numberOfChromosome - keep;
-        // 尺寸发生变化，删除旧的再申请新空间
-        delete[] this->selectedChromosome;
-        delete[] this->newChromosome;
-        this->selectedChromosome = new Chromosome*[2 * this->kill];
-        this->newChromosome = new Chromosome*[this->kill];
         this->r = r;
         unsigned long i = 0;
+        this->maxFitness = this->population->getMaxFitnessChromosome()->getFitness();
         while (i < maxLoop && this->maxFitness < stopFitness) {
             this->select();
             this->crossover();
@@ -120,9 +124,9 @@ namespace GeneticAlgorithm {
     }
 
     void MainProcess::replaceChromosome(Chromosome* chromosome) {
-        Chromosome* max = this->population->getMaxFitnessChromosome();
+        Chromosome* maxChromosome = this->population->getMaxFitnessChromosome();
         for (unsigned long offset = this->numberOfChromosome - 1; offset + 2 > 1; offset--) {
-            if ((void*)this->population->getChromosome(offset) != (void*)max) {
+            if ((void*)this->population->getChromosome(offset) != (void*)maxChromosome) {
                 this->population->replaceChromosome(offset, chromosome);
                 return;
             }
