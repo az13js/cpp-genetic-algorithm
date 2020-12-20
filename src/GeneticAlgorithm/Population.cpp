@@ -22,50 +22,35 @@ namespace GeneticAlgorithm {
     }
 
     bool Population::setChromosome(unsigned long offset, Chromosome *chromosome) {
-        if (offset < this->numberOfChromosome && !this->chromosomeArray[offset]) {
-            if (this->isMaxFitnessChromosomeCache) {
-                if (this->maxFitnessChromosomeCache->getFitness() > chromosome->getFitness()) {
-                    if (this->maxFitnessChromosomeOffset != offset) {
-                        this->chromosomeArray[offset] = chromosome;
-                    } else {
-                        this->isMaxFitnessChromosomeCache = false;
-                        this->chromosomeArray[offset] = chromosome;
-                    }
-                } else {
-                    this->maxFitnessChromosomeCache = chromosome;
-                    this->maxFitnessChromosomeOffset = offset;
-                    this->chromosomeArray[offset] = chromosome;
-                }
-            } else {
-                this->chromosomeArray[offset] = chromosome;
-            }
+        if (offset >= this->numberOfChromosome) {
+            return false;
+        }
+        if (nullptr == this->chromosomeArray[offset]) {
+            this->chromosomeArray[offset] = chromosome;
+            this->isMaxFitnessChromosomeCache = false;
             return true;
         }
-        return false;
+        Chromosome* origin = this->chromosomeArray[offset];
+        if ((void*)origin == (void*)chromosome) {
+            return true;
+        }
+        if (this->isMaxFitnessChromosomeCache) {
+            if ((void*)(this->maxFitnessChromosomeCache) == (void*)chromosome) {
+                return false;
+            }
+            if (this->maxFitnessChromosomeCache->getFitness() > chromosome->getFitness()) {
+                this->isMaxFitnessChromosomeCache = false;
+            } else {
+                this->maxFitnessChromosomeCache = chromosome;
+            }
+        }
+        this->chromosomeArray[offset] = chromosome;
+        delete origin;
+        return true;
     }
 
     bool Population::replaceChromosome(unsigned long offset, Chromosome *chromosome) {
-        if (offset < this->numberOfChromosome && this->chromosomeArray[offset]) {
-            delete this->chromosomeArray[offset];
-            if (this->isMaxFitnessChromosomeCache) { // 这段逻辑与setChromosome里面的相同
-                if (this->maxFitnessChromosomeCache->getFitness() > chromosome->getFitness()) {
-                    if (this->maxFitnessChromosomeOffset != offset) {
-                        this->chromosomeArray[offset] = chromosome;
-                    } else {
-                        this->isMaxFitnessChromosomeCache = false;
-                        this->chromosomeArray[offset] = chromosome;
-                    }
-                } else {
-                    this->maxFitnessChromosomeCache = chromosome;
-                    this->maxFitnessChromosomeOffset = offset;
-                    this->chromosomeArray[offset] = chromosome;
-                }
-            } else {
-                this->chromosomeArray[offset] = chromosome;
-            }
-            return true;
-        }
-        return false;
+        return this->setChromosome(offset, chromosome);
     }
 
     Chromosome* Population::getChromosome(unsigned long offset) {
