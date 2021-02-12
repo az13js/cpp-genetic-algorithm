@@ -37,9 +37,9 @@ namespace GeneticAlgorithm {
         long double r
     ) {
         using namespace std;
-        jthread** threads = new jthread*[this->threadNumber];
+        thread** threads = new thread*[this->threadNumber];
         for (unsigned long i = 0; i < this->threadNumber; i++) {
-            threads[i] = new jthread([](
+            threads[i] = new thread([](
                 MainProcess* process,
                 unsigned long numberOfChromosome,
                 unsigned long lengthOfChromosome,
@@ -54,6 +54,7 @@ namespace GeneticAlgorithm {
             }, this->process[i], numberOfChromosome, lengthOfChromosome, min, max, maxLoop, stopFitness, keep, r);
         }
         for (unsigned long i = 0; i < this->threadNumber; i++) {
+            threads[i]->join();
             delete threads[i];
         }
         delete[] threads;
@@ -66,9 +67,9 @@ namespace GeneticAlgorithm {
         long double r // 基因突变的概率
     ) {
         using namespace std;
-        jthread** threads = new jthread*[this->threadNumber];
+        thread** threads = new thread*[this->threadNumber];
         for (unsigned long i = 0; i < this->threadNumber; i++) {
-            threads[i] = new jthread([](
+            threads[i] = new thread([](
                 MainProcess* process,
                 unsigned long maxLoop,
                 long double stopFitness,
@@ -79,6 +80,7 @@ namespace GeneticAlgorithm {
             }, this->process[i], maxLoop, stopFitness, keep, r);
         }
         for (unsigned long i = 0; i < this->threadNumber; i++) {
+            threads[i]->join();
             delete threads[i];
         }
         delete[] threads;
