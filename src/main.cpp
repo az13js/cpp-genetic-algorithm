@@ -5,7 +5,6 @@
  *
  */
 #include <iostream>
-#include "GeneticAlgorithm.h"
 #include "GeneticAlgorithm/MainProcess.h"
 
 using namespace GeneticAlgorithm;
