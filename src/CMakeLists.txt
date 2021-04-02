@@ -17,6 +17,7 @@ add_executable(GeneticAlgorithm.out ${CPP_FILES})
 # 给编译过程添加include的目录，这里是用于包含生成的记录项目版本的头文件
 target_include_directories(GeneticAlgorithm.out PUBLIC "${PROJECT_BINARY_DIR}")
 # 为C++程序提供多线程库的链接支持，不需要使用多线程来开发时可以注释掉下面三行
-#set(THREADS_PREFER_PTHREAD_FLAG ON)
-#find_package(Threads REQUIRED)
-#target_link_libraries(GeneticAlgorithm.out PUBLIC Threads::Threads)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+target_link_libraries(GeneticAlgorithm.out PUBLIC Threads::Threads)
+
